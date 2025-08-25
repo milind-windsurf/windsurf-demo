@@ -18,12 +18,14 @@ export function getDistance(obj1, obj2) {
 }
 
 export function calculateCenterOfMass(cells) {
+    if (cells.length === 0) return { x: 0, y: 0 };
+    
     const totalScore = cells.reduce((sum, cell) => sum + cell.score, 0);
     if (totalScore === 0) return { x: 0, y: 0 };
     
     return {
-        x: cells.reduce((sum, cell) => sum + cell.x * cell.score, 0) / totalScore,
-        y: cells.reduce((sum, cell) => sum + cell.y * cell.score, 0) / totalScore
+        x: cells.reduce((sum, cell) => sum + cell.x, 0) / cells.length,
+        y: cells.reduce((sum, cell) => sum + cell.y, 0) / cells.length
     };
 }
 
