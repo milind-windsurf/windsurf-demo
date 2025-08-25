@@ -9,17 +9,21 @@ function toggleInvincibility() {
     const now = Date.now();
     
     gameState.playerCells.forEach(cell => {
-        if (now - cell.lastInvincibilityUse >= INVINCIBILITY_COOLDOWN || cell.lastInvincibilityUse === 0) {
-            if (!cell.invincible) {
-                cell.invincible = true;
-                cell.invincibilityEndTime = now + INVINCIBILITY_DURATION;
-                cell.lastInvincibilityUse = now;
-                console.log('Invincibility activated!');
-            }
-        } else {
+        if (cell.invincible) {
+            console.log('Invincibility already active');
+            return;
+        }
+        
+        if (cell.lastInvincibilityUse !== 0 && now - cell.lastInvincibilityUse < INVINCIBILITY_COOLDOWN) {
             const remainingCooldown = Math.ceil((INVINCIBILITY_COOLDOWN - (now - cell.lastInvincibilityUse)) / 1000);
             console.log(`Invincibility on cooldown for ${remainingCooldown} more seconds`);
+            return;
         }
+        
+        cell.invincible = true;
+        cell.invincibilityEndTime = now + INVINCIBILITY_DURATION;
+        cell.lastInvincibilityUse = now;
+        console.log('Invincibility activated!');
     });
 }
 
