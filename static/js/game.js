@@ -22,7 +22,6 @@ function toggleInvincibility() {
         
         cell.invincible = true;
         cell.invincibilityEndTime = now + INVINCIBILITY_DURATION;
-        cell.lastInvincibilityUse = now;
         console.log('Invincibility activated!');
     });
 }
@@ -82,6 +81,7 @@ function updateInvincibility() {
     gameState.playerCells.forEach(cell => {
         if (cell.invincible && now >= cell.invincibilityEndTime) {
             cell.invincible = false;
+            cell.lastInvincibilityUse = now;
             console.log('Invincibility expired');
         }
     });
