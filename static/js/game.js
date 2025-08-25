@@ -3,6 +3,28 @@ import { initRenderer, resizeCanvas, drawGame, drawMinimap, updateLeaderboard } 
 import { updatePlayer, updateAI, initEntities, handlePlayerSplit } from './entities.js';
 import { handleFoodCollisions, handlePlayerAICollisions, handleAIAICollisions, respawnEntities } from './collisions.js';
 import { initUI } from './ui.js';
+import { INVINCIBILITY_DURATION, INVINCIBILITY_KEY, INVINCIBILITY_COOLDOWN } from './config.js';
+
+function toggleInvincibility() {
+    const now = Date.now();
+    
+    gameState.playerCells.forEach(cell => {
+        if (cell.invincible) {
+            console.log('Invincibility already active');
+            return;
+        }
+        
+        if (cell.lastInvincibilityUse !== 0 && now - cell.lastInvincibilityUse < INVINCIBILITY_COOLDOWN) {
+            const remainingCooldown = Math.ceil((INVINCIBILITY_COOLDOWN - (now - cell.lastInvincibilityUse)) / 1000);
+            console.log(`Invincibility on cooldown for ${remainingCooldown} more seconds`);
+            return;
+        }
+        
+        cell.invincible = true;
+        cell.invincibilityEndTime = now + INVINCIBILITY_DURATION;
+        console.log('Invincibility activated!');
+    });
+}
 
 function setupInputHandlers() {
     const canvas = document.getElementById('gameCanvas');
@@ -21,6 +43,12 @@ function setupInputHandlers() {
     // Window resize
     window.addEventListener('resize', () => {
         resizeCanvas();
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (e.code === INVINCIBILITY_KEY) {
+            toggleInvincibility();
+        }
     });
 }
 
@@ -48,8 +76,20 @@ function verifyGameState() {
     }
 }
 
+function updateInvincibility() {
+    const now = Date.now();
+    gameState.playerCells.forEach(cell => {
+        if (cell.invincible && now >= cell.invincibilityEndTime) {
+            cell.invincible = false;
+            cell.lastInvincibilityUse = now;
+            console.log('Invincibility expired');
+        }
+    });
+}
+
 function gameLoop() {
     updatePlayer();
+    updateInvincibility();
     updateAI();
     checkCollisions();
     updateLeaderboard();

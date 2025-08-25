@@ -6,7 +6,10 @@ export const gameState = {
         y: WORLD_SIZE / 2,
         score: STARTING_SCORE,
         velocityX: 0,
-        velocityY: 0
+        velocityY: 0,
+        invincible: false,
+        invincibilityEndTime: 0,
+        lastInvincibilityUse: 0
     }],
     playerName: 'Windsurf',
     camera: {

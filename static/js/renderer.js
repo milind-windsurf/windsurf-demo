@@ -21,6 +21,18 @@ export function resizeCanvas() {
     canvas.height = window.innerHeight;
 }
 
+function drawInvincibilityGlow(x, y, size) {
+    const glowSize = size + 10;
+    const gradient = ctx.createRadialGradient(x, y, size, x, y, glowSize);
+    gradient.addColorStop(0, 'rgba(255, 215, 0, 0.3)');
+    gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+    
+    ctx.beginPath();
+    ctx.arc(x, y, glowSize, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+}
+
 function drawCircle(x, y, value, color, isFood) {
     const size = isFood ? value : getSize(value);
     ctx.beginPath();
@@ -101,6 +113,11 @@ export function drawGame() {
         
         if (screenX >= -size && screenX <= canvas.width + size &&
             screenY >= -size && screenY <= canvas.height + size) {
+            
+            if (cell.invincible) {
+                drawInvincibilityGlow(screenX, screenY, size);
+            }
+            
             drawCellWithName(screenX, screenY, cell.score, COLORS.PLAYER, gameState.playerName);
         }
     });

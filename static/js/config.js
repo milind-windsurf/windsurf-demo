@@ -19,6 +19,10 @@ export const MERGE_COOLDOWN = 10000;  // Time in ms before cells can merge
 export const MERGE_FORCE = 0.3;       // Strength of the merging force
 export const MERGE_START_FORCE = 0.1; // Initial attraction force (before merge cooldown)
 
+export const INVINCIBILITY_DURATION = 5000; // 5 seconds in milliseconds
+export const INVINCIBILITY_KEY = 'KeyI'; // 'I' key for toggling invincibility
+export const INVINCIBILITY_COOLDOWN = 10000; // 10 seconds cooldown between uses
+
 export const COLORS = {
     PLAYER: '#008080',  // Teal color
     MINIMAP: {
