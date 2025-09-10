@@ -65,10 +65,12 @@ export function drawGame() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Update camera to follow player's center of mass
-    const centerOfMass = calculateCenterOfMass(gameState.playerCells);
-    gameState.camera.x = centerOfMass.x - canvas.width / 2;
-    gameState.camera.y = centerOfMass.y - canvas.height / 2;
+    // Update camera to follow player's center of mass (only if not manually controlled)
+    if (!gameState.minimapDrag.manualControl) {
+        const centerOfMass = calculateCenterOfMass(gameState.playerCells);
+        gameState.camera.x = centerOfMass.x - canvas.width / 2;
+        gameState.camera.y = centerOfMass.y - canvas.height / 2;
+    }
 
     // Draw food
     gameState.food.forEach(food => {
