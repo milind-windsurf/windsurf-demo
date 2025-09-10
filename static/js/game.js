@@ -3,6 +3,7 @@ import { initRenderer, resizeCanvas, drawGame, drawMinimap, updateLeaderboard } 
 import { updatePlayer, updateAI, initEntities, handlePlayerSplit } from './entities.js';
 import { handleFoodCollisions, handlePlayerAICollisions, handleAIAICollisions, respawnEntities } from './collisions.js';
 import { initUI } from './ui.js';
+import { WORLD_SIZE } from './config.js';
 
 function setupInputHandlers() {
     const canvas = document.getElementById('gameCanvas');
@@ -21,6 +22,60 @@ function setupInputHandlers() {
     // Window resize
     window.addEventListener('resize', () => {
         resizeCanvas();
+    });
+}
+
+function setupMinimapHandlers() {
+    const minimapCanvas = document.getElementById('minimap');
+    const gameCanvas = document.getElementById('gameCanvas');
+    
+    minimapCanvas.addEventListener('mousedown', (e) => {
+        const rect = minimapCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const MINIMAP_SIZE = 150;
+        const scale = MINIMAP_SIZE / WORLD_SIZE;
+        const worldX = x / scale;
+        const worldY = y / scale;
+        
+        gameState.camera.x = worldX - gameCanvas.width / 2;
+        gameState.camera.y = worldY - gameCanvas.height / 2;
+        
+        gameState.minimapDrag.isDragging = true;
+        gameState.minimapDrag.manualControl = true;
+        
+        e.preventDefault();
+    });
+    
+    minimapCanvas.addEventListener('mousemove', (e) => {
+        if (!gameState.minimapDrag.isDragging) return;
+        
+        const rect = minimapCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const MINIMAP_SIZE = 150;
+        const scale = MINIMAP_SIZE / WORLD_SIZE;
+        const worldX = x / scale;
+        const worldY = y / scale;
+        
+        gameState.camera.x = worldX - gameCanvas.width / 2;
+        gameState.camera.y = worldY - gameCanvas.height / 2;
+        
+        e.preventDefault();
+    });
+    
+    minimapCanvas.addEventListener('mouseup', () => {
+        gameState.minimapDrag.isDragging = false;
+    });
+    
+    minimapCanvas.addEventListener('mouseleave', () => {
+        gameState.minimapDrag.isDragging = false;
+    });
+    
+    minimapCanvas.addEventListener('dblclick', () => {
+        gameState.minimapDrag.manualControl = false;
     });
 }
 
@@ -85,6 +140,9 @@ async function initGame() {
         
         setupInputHandlers();
         console.log('Input handlers set up');
+        
+        setupMinimapHandlers();
+        console.log('Minimap handlers set up');
         
         initEntities();
         console.log('Entities initialized');
