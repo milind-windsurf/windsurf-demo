@@ -97,9 +97,25 @@ export function handlePlayerAICollisions() {
     }
 }
 
+function checkAICollision(ai1, ai2, ai1Index, ai2Index) {
+    const distance = getDistance(ai1, ai2);
+    const ai1Size = getSize(ai1.score);
+    const ai2Size = getSize(ai2.score);
+    const minDistance = ai1Size + ai2Size;
+
+    if (distance < minDistance) {
+        if (ai1Size > ai2Size * COLLISION_THRESHOLD) {
+            return { winner: ai1Index, loser: ai2Index, scoreGain: ai2.score + 100 };
+        } else if (ai2Size > ai1Size * COLLISION_THRESHOLD) {
+            return { winner: ai2Index, loser: ai1Index, scoreGain: ai1.score + 100 };
+        }
+    }
+    return null;
+}
+
 export function handleAIAICollisions() {
     const aisToRemove = new Set();
-    const scoreGains = new Map(); // Map of AI index to score gain
+    const scoreGains = new Map();
 
     for (let i = 0; i < gameState.aiPlayers.length; i++) {
         if (aisToRemove.has(i)) continue;
@@ -107,25 +123,12 @@ export function handleAIAICollisions() {
         for (let j = i + 1; j < gameState.aiPlayers.length; j++) {
             if (aisToRemove.has(j)) continue;
 
-            const ai1 = gameState.aiPlayers[i];
-            const ai2 = gameState.aiPlayers[j];
-            
-            const distance = getDistance(ai1, ai2);
-            const ai1Size = getSize(ai1.score);
-            const ai2Size = getSize(ai2.score);
-            const minDistance = ai1Size + ai2Size;
-
-            if (distance < minDistance) {
-                if (ai1Size > ai2Size * COLLISION_THRESHOLD) {
-                    const currentGain = scoreGains.get(i) || 0;
-                    scoreGains.set(i, currentGain + ai2.score + 100);
-                    aisToRemove.add(j);
-                } else if (ai2Size > ai1Size * COLLISION_THRESHOLD) {
-                    const currentGain = scoreGains.get(j) || 0;
-                    scoreGains.set(j, currentGain + ai1.score + 100);
-                    aisToRemove.add(i);
-                    break;
-                }
+            const collision = checkAICollision(gameState.aiPlayers[i], gameState.aiPlayers[j], i, j);
+            if (collision) {
+                const currentGain = scoreGains.get(collision.winner) || 0;
+                scoreGains.set(collision.winner, currentGain + collision.scoreGain);
+                aisToRemove.add(collision.loser);
+                if (collision.loser === i) break;
             }
         }
     }
