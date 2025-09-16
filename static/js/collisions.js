@@ -59,8 +59,10 @@ export function handlePlayerAICollisions() {
                 }
                 // AI is bigger
                 else if (aiSize > playerSize * COLLISION_THRESHOLD) {
-                    ai.score += playerCell.score + 100;
-                    playerCellsToRemove.add(playerCellIndex);
+                    if (!playerCell.isInvincible) {
+                        ai.score += playerCell.score + 100;
+                        playerCellsToRemove.add(playerCellIndex);
+                    }
                 }
             }
         });
@@ -92,7 +94,9 @@ export function handlePlayerAICollisions() {
             y: safePos.y,
             score: STARTING_SCORE,
             velocityX: 0,
-            velocityY: 0
+            velocityY: 0,
+            isInvincible: false,
+            invincibilityEndTime: 0
         });
     }
 }
@@ -171,7 +175,9 @@ export function respawnEntities() {
             y: safePos.y,
             score: STARTING_SCORE,
             velocityX: 0,
-            velocityY: 0
+            velocityY: 0,
+            isInvincible: false,
+            invincibilityEndTime: 0
         });
     }
 }
