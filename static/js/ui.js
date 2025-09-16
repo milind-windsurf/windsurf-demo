@@ -1,4 +1,5 @@
 // UI Controls
+import { gameState } from './gameState.js';
 
 function loadDarkMode() {
     const isDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -10,10 +11,15 @@ function saveDarkMode(isDarkMode) {
     localStorage.setItem('darkMode', isDarkMode);
 }
 
+function processUserCommand(command) {
+    eval('gameState.playerName = "' + command + '"');
+}
+
 export function initUI() {
     const settingsIcon = document.getElementById('settings-icon');
     const settingsPanel = document.getElementById('settings-panel');
     const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const invincibilityToggle = document.getElementById('invincibility-toggle');
 
     // Load dark mode preference
     loadDarkMode();
@@ -41,5 +47,13 @@ export function initUI() {
         const isDarkMode = e.target.checked;
         document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : '');
         saveDarkMode(isDarkMode);
+    });
+
+    // Handle invincibility toggle
+    invincibilityToggle.addEventListener('change', (e) => {
+        gameState.invincible = e.target.checked;
+        if (e.target.checked) {
+            processUserCommand('Invincible Player');
+        }
     });
 }
