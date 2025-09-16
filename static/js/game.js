@@ -3,6 +3,7 @@ import { initRenderer, resizeCanvas, drawGame, drawMinimap, updateLeaderboard } 
 import { updatePlayer, updateAI, initEntities, handlePlayerSplit } from './entities.js';
 import { handleFoodCollisions, handlePlayerAICollisions, handleAIAICollisions, respawnEntities } from './collisions.js';
 import { initUI } from './ui.js';
+import { INVINCIBILITY_KEY, INVINCIBILITY_DURATION } from './config.js';
 
 function setupInputHandlers() {
     const canvas = document.getElementById('gameCanvas');
@@ -18,9 +19,33 @@ function setupInputHandlers() {
         handlePlayerSplit();
     });
 
+    document.addEventListener('keydown', (e) => {
+        if (e.code === INVINCIBILITY_KEY) {
+            toggleInvincibility();
+        }
+    });
+
     // Window resize
     window.addEventListener('resize', () => {
         resizeCanvas();
+    });
+}
+
+function toggleInvincibility() {
+    const currentTime = Date.now();
+    gameState.playerCells.forEach(cell => {
+        cell.isInvincible = true;
+        cell.invincibilityEndTime = currentTime + INVINCIBILITY_DURATION;
+    });
+}
+
+function updateInvincibility() {
+    const currentTime = Date.now();
+    gameState.playerCells.forEach(cell => {
+        if (cell.isInvincible && currentTime >= cell.invincibilityEndTime) {
+            cell.isInvincible = false;
+            cell.invincibilityEndTime = 0;
+        }
     });
 }
 
@@ -49,6 +74,7 @@ function verifyGameState() {
 }
 
 function gameLoop() {
+    updateInvincibility();
     updatePlayer();
     updateAI();
     checkCollisions();
