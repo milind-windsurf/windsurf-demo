@@ -1,4 +1,5 @@
-import { getSize, getDistance, calculateCenterOfMass } from '../utils.js';
+import { getSize, getDistance, calculateCenterOfMass, getRandomPosition, findSafeSpawnLocation } from '../utils.js';
+import { WORLD_SIZE } from '../config.js';
 
 describe('getSize', () => {
   test('returns correct size for score 0', () => {
@@ -66,5 +67,88 @@ describe('calculateCenterOfMass', () => {
       { x: 30, y: 40, score: 0 }
     ];
     expect(calculateCenterOfMass(cells)).toEqual({ x: 0, y: 0 });
+  });
+});
+
+describe('getRandomPosition', () => {
+  test('returns position within world bounds', () => {
+    const pos = getRandomPosition();
+    expect(pos.x).toBeGreaterThanOrEqual(0);
+    expect(pos.x).toBeLessThanOrEqual(WORLD_SIZE);
+    expect(pos.y).toBeGreaterThanOrEqual(0);
+    expect(pos.y).toBeLessThanOrEqual(WORLD_SIZE);
+  });
+
+  test('returns object with x and y properties', () => {
+    const pos = getRandomPosition();
+    expect(pos).toHaveProperty('x');
+    expect(pos).toHaveProperty('y');
+  });
+
+  test('generates different positions on multiple calls', () => {
+    const positions = [];
+    for (let i = 0; i < 10; i++) {
+      positions.push(getRandomPosition());
+    }
+    const allSame = positions.every(pos => 
+      pos.x === positions[0].x && pos.y === positions[0].y
+    );
+    expect(allSame).toBe(false);
+  });
+});
+
+describe('findSafeSpawnLocation', () => {
+  test('returns position away from AI players', () => {
+    const gameState = {
+      aiPlayers: [{ x: 100, y: 100, score: 100 }],
+      playerCells: []
+    };
+    
+    const pos = findSafeSpawnLocation(gameState, 200);
+    const distance = Math.sqrt(Math.pow(pos.x - 100, 2) + Math.pow(pos.y - 100, 2));
+    
+    expect(distance).toBeGreaterThan(0);
+  });
+
+  test('returns position away from player cells', () => {
+    const gameState = {
+      aiPlayers: [],
+      playerCells: [{ x: 500, y: 500, score: 200 }]
+    };
+    
+    const pos = findSafeSpawnLocation(gameState, 150);
+    const distance = Math.sqrt(Math.pow(pos.x - 500, 2) + Math.pow(pos.y - 500, 2));
+    
+    expect(distance).toBeGreaterThan(0);
+  });
+
+  test('returns fallback position when no safe spot found', () => {
+    const gameState = {
+      aiPlayers: [],
+      playerCells: []
+    };
+    
+    for (let x = 0; x < WORLD_SIZE; x += 100) {
+      for (let y = 0; y < WORLD_SIZE; y += 100) {
+        gameState.aiPlayers.push({ x, y, score: 10000 });
+      }
+    }
+    
+    const pos = findSafeSpawnLocation(gameState, 500);
+    expect(pos).toHaveProperty('x');
+    expect(pos).toHaveProperty('y');
+  });
+
+  test('returns valid position for empty gameState', () => {
+    const gameState = {
+      aiPlayers: [],
+      playerCells: []
+    };
+    
+    const pos = findSafeSpawnLocation(gameState);
+    expect(pos.x).toBeGreaterThanOrEqual(0);
+    expect(pos.x).toBeLessThanOrEqual(WORLD_SIZE);
+    expect(pos.y).toBeGreaterThanOrEqual(0);
+    expect(pos.y).toBeLessThanOrEqual(WORLD_SIZE);
   });
 });
