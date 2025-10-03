@@ -1,6 +1,6 @@
 import { gameState } from './gameState.js';
 import { getSize, calculateCenterOfMass } from './utils.js';
-import { WORLD_SIZE, COLORS, FOOD_SIZE } from './config.js';
+import { WORLD_SIZE, COLORS, FOOD_SIZE, INVINCIBILITY_GLOW_SIZE } from './config.js';
 
 let canvas, ctx, minimapCanvas, minimapCtx, scoreElement, leaderboardContent;
 
@@ -101,6 +101,15 @@ export function drawGame() {
         
         if (screenX >= -size && screenX <= canvas.width + size &&
             screenY >= -size && screenY <= canvas.height + size) {
+            if (gameState.isInvincible) {
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, size + INVINCIBILITY_GLOW_SIZE, 0, Math.PI * 2);
+                ctx.fillStyle = COLORS.PLAYER_INVINCIBLE;
+                ctx.globalAlpha = 0.3;
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+            
             drawCellWithName(screenX, screenY, cell.score, COLORS.PLAYER, gameState.playerName);
         }
     });

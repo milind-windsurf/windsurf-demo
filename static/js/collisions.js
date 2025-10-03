@@ -57,8 +57,8 @@ export function handlePlayerAICollisions() {
                     scoreGains.set(playerCellIndex, currentGain + ai.score + 100);
                     aiIndicesToRemove.add(aiIndex);
                 }
-                // AI is bigger
-                else if (aiSize > playerSize * COLLISION_THRESHOLD) {
+                // AI is bigger - only consume player if not invincible
+                else if (aiSize > playerSize * COLLISION_THRESHOLD && !gameState.isInvincible) {
                     ai.score += playerCell.score + 100;
                     playerCellsToRemove.add(playerCellIndex);
                 }

@@ -20,10 +20,14 @@ export const MERGE_FORCE = 0.3;       // Strength of the merging force
 export const MERGE_START_FORCE = 0.1; // Initial attraction force (before merge cooldown)
 
 export const COLORS = {
-    PLAYER: '#008080',  // Teal color
+    PLAYER: '#008080',
+    PLAYER_INVINCIBLE: '#FFD700',
     MINIMAP: {
         PLAYER: '#4CAF50',
         TOP_PLAYER: '#FFC107',
         OTHER: 'rgba(255, 255, 255, 0.3)'
     }
 };
+
+export const INVINCIBILITY_KEY = 'i';
+export const INVINCIBILITY_GLOW_SIZE = 5;
