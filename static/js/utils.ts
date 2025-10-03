@@ -1,0 +1,90 @@
+import { WORLD_SIZE } from './config.js';
+import type { Position, PlayerCell, AIPlayer } from '../../types/game.js';
+
+interface GameStateForUtils {
+    playerCells: PlayerCell[];
+    aiPlayers: AIPlayer[];
+}
+
+export function getSize(score: number): number {
+    return Math.sqrt(score) + 20;
+}
+
+export function getDistance(obj1: Position, obj2: Position): number {
+    const dx = obj1.x - obj2.x;
+    const dy = obj1.y - obj2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+export function getRandomPosition(): Position {
+    return {
+        x: Math.random() * WORLD_SIZE,
+        y: Math.random() * WORLD_SIZE
+    };
+}
+
+export function calculateCenterOfMass(cells: PlayerCell[]): Position {
+    if (cells.length === 0) return { x: 0, y: 0 };
+    
+    const totalScore = cells.reduce((sum, cell) => sum + cell.score, 0);
+    if (totalScore === 0) return { x: 0, y: 0 };
+    
+    return {
+        x: cells.reduce((sum, cell) => sum + cell.x, 0) / cells.length,
+        y: cells.reduce((sum, cell) => sum + cell.y, 0) / cells.length
+    };
+}
+
+export function findSafeSpawnLocation(gameState: GameStateForUtils, minDistance: number = 100): Position {
+    const maxAttempts = 50;
+    let attempts = 0;
+    
+    while (attempts < maxAttempts) {
+        const pos = getRandomPosition();
+        let isSafe = true;
+
+        for (const ai of gameState.aiPlayers) {
+            const distance = getDistance(pos, ai);
+            const safeDistance = getSize(ai.score) + minDistance;
+            if (distance < safeDistance) {
+                isSafe = false;
+                break;
+            }
+        }
+
+        for (const cell of gameState.playerCells) {
+            const distance = getDistance(pos, cell);
+            const safeDistance = getSize(cell.score) + minDistance;
+            if (distance < safeDistance) {
+                isSafe = false;
+                break;
+            }
+        }
+
+        if (isSafe) {
+            return pos;
+        }
+
+        attempts++;
+    }
+
+    let bestPos = getRandomPosition();
+    let maxMinDistance = 0;
+
+    for (let i = 0; i < 20; i++) {
+        const pos = getRandomPosition();
+        let minDistanceToPlayer = Infinity;
+
+        [...gameState.aiPlayers, ...gameState.playerCells].forEach(entity => {
+            const distance = getDistance(pos, entity);
+            minDistanceToPlayer = Math.min(minDistanceToPlayer, distance);
+        });
+
+        if (minDistanceToPlayer > maxMinDistance) {
+            maxMinDistance = minDistanceToPlayer;
+            bestPos = pos;
+        }
+    }
+
+    return bestPos;
+}
