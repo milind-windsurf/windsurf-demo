@@ -3,22 +3,27 @@ import { initRenderer, resizeCanvas, drawGame, drawMinimap, updateLeaderboard } 
 import { updatePlayer, updateAI, initEntities, handlePlayerSplit } from './entities.js';
 import { handleFoodCollisions, handlePlayerAICollisions, handleAIAICollisions, respawnEntities } from './collisions.js';
 import { initUI } from './ui.js';
+import { INVINCIBILITY_KEY } from './config.js';
 
 function setupInputHandlers() {
     const canvas = document.getElementById('gameCanvas');
     
-    // Mouse movement
     canvas.addEventListener('mousemove', (e) => {
         mouse.x = e.clientX;
         mouse.y = e.clientY;
     });
 
-    // Mouse click for splitting
     canvas.addEventListener('click', (e) => {
         handlePlayerSplit();
     });
 
-    // Window resize
+    globalThis.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === INVINCIBILITY_KEY) {
+            gameState.isInvincible = !gameState.isInvincible;
+            console.log('Invincibility:', gameState.isInvincible ? 'ON' : 'OFF');
+        }
+    });
+
     window.addEventListener('resize', () => {
         resizeCanvas();
     });
