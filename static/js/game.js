@@ -17,7 +17,7 @@ function setupInputHandlers() {
         handlePlayerSplit();
     });
 
-    window.addEventListener('keydown', (e) => {
+    globalThis.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === INVINCIBILITY_KEY) {
             gameState.isInvincible = !gameState.isInvincible;
             console.log('Invincibility:', gameState.isInvincible ? 'ON' : 'OFF');

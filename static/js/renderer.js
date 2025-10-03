@@ -107,7 +107,7 @@ export function drawGame() {
                 ctx.fillStyle = COLORS.PLAYER_INVINCIBLE;
                 ctx.globalAlpha = 0.3;
                 ctx.fill();
-                ctx.globalAlpha = 1.0;
+                ctx.globalAlpha = 1;
             }
             
             drawCellWithName(screenX, screenY, cell.score, COLORS.PLAYER, gameState.playerName);
